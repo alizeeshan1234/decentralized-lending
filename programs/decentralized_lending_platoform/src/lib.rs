@@ -55,13 +55,3 @@ pub mod decentralized_lending_platoform {
         instructions::repay_funds(ctx, repay_amount)
     }
 }
-
-/*instructions : 
-    init_reserve(mint, initial_liquidity)
-    deposit_collateral(amount, mint)
-    borrow(amount, mint)
-    repay(amount, mint)
-    withdraw_collateral(amount, mint)
-    liquidate(user, repay_mint)
-    accrue_interest()
-*/
