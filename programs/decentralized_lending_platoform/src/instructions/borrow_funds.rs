@@ -102,7 +102,6 @@ pub fn borrow_funds(
     let wanted_mint = &ctx.accounts.wanted_mint;
     let borrower_account_info = &mut ctx.accounts.borrower_account_info;
 
-    // Step 2: Determine which token is collateral and which is being borrowed
     let (collateral_mint, borrow_mint) = if giving_mint.key() == liquidity_pool.mint_a {
         (liquidity_pool.mint_a, liquidity_pool.mint_b)
     } else if giving_mint.key() == liquidity_pool.mint_b {
@@ -111,7 +110,6 @@ pub fn borrow_funds(
         return Err(ErrorCode::InvalidMint.into());
     };
 
-    // Step 3: Calculate amount to borrow using LTV ratio (assume 50%) d d
     let ltv = liquidity_pool.ltv_ratio; // e.g. 50 means 50%
     let borrow_amount = amount
         .checked_mul(ltv as u64)
@@ -119,7 +117,6 @@ pub fn borrow_funds(
         .checked_div(100)
         .ok_or(ErrorCode::MathOverflow)?;
 
-    // Step 4: Transfer collateral from borrower to vault
     transfer_checked(
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
@@ -138,7 +135,6 @@ pub fn borrow_funds(
         giving_mint.decimals,
     )?;
 
-    // Step 5: Transfer borrowed tokens from vault to borrower
     let vault_account = if borrow_mint == liquidity_pool.mint_a {
         ctx.accounts.token_vault_a.to_account_info()
     } else {
@@ -168,7 +164,6 @@ pub fn borrow_funds(
         wanted_mint.decimals,
     )?;
 
-    // Step 6: Save borrow info
     borrower_account_info.borrower = borrower.key();
     borrower_account_info.borrowed_from_pool = liquidity_pool.key();
     borrower_account_info.total_borrowed = borrower_account_info.total_borrowed.checked_add(borrow_amount).unwrap();
